@@ -1,1 +1,1 @@
-[{"title":"books"},{"title":"clothes"},{"title":"electronics"},{"title":"fourth product"}]
+[{"id":"12345","title":"A Book","imageUrl":"https://www.publicdomainpictures.net/pictures/10000/velka/1-1210009435EGmE.jpg","description":"This is an awesome book!","price":"19"},{"title":"clothes","imageUrl":"https://source.unsplash.com/random","description":"good clothes","price":"200","id":"0.7916721679274805"}]
