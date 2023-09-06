@@ -1,5 +1,6 @@
 const Product = require('../models/product');
 
+
 exports.getAddProduct = (req, res, next) => {
   res.render('admin/add-product', {
     pageTitle: 'Add Product',
@@ -17,8 +18,9 @@ exports.postAddProduct = (req, res, next) => {
   const price = req.body.price;
   const description = req.body.description;
   const product = new Product(null,title, imageUrl, description, price);
-  product.save();
-  res.redirect('/');
+  product.save().then(()=>
+     res.redirect('/')
+    ).catch(err=>console.log(err));
 };
 
 
@@ -28,37 +30,39 @@ exports.getEditProduct = (req, res, next) => {
     return res.redirect('/')
   }
   const {productId }= req.params;
-  Product.findById(productId,product=>{
+  Product.findById(productId).then(([product])=>{
     if(!product) return res.redirect('/');
     res.render('admin/add-product', {
       pageTitle: 'Edit Product',
       path: '/admin/edit-product',
       editing :editMode,
-      product:product
+      product:product[0]
     });
-  })
+  }).catch(err=>console.log(err))
 };
 
 exports.postEditProduct =(req,res)=>{
 const {title,productId, imageUrl, price,description} = req.body;
 const updatedProduct = new Product(productId,title,imageUrl,description,price);
-updatedProduct.save();
+updatedProduct.save().then(()=>
+
 res.redirect('/admin/products')
+).catch(err=>console.log(err));
 }
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll(products => {
+  Product.fetchAll().then(([products])=>{
     res.render('admin/products', {
       prods: products,
       pageTitle: 'Admin Products',
       path: '/admin/products'
     });
-  });
+  }).catch(err=>console.log(err));
 };
 
 exports.deleteProduct=(req,res)=>{
 const {productId} = req.params;
-const deleteProduct = Product.delete(productId);
-if(!deleteProduct) console.log('something went wrong');;
+Product.delete(productId).then(()=>
 res.redirect('/admin/products')
+).catch(err=>console.log(err))
 }
