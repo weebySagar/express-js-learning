@@ -1,3 +1,4 @@
+const { where } = require('sequelize');
 const Product = require('../models/product');
 
 
@@ -17,10 +18,7 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(null,title, imageUrl, description, price);
-  product.save().then(()=>
-     res.redirect('/')
-    ).catch(err=>console.log(err));
+  Product.create({title,price,description,imageUrl}).then(()=>res.redirect('/admin/products')).catch(err=>console.log(err))
 };
 
 
@@ -30,28 +28,27 @@ exports.getEditProduct = (req, res, next) => {
     return res.redirect('/')
   }
   const {productId }= req.params;
-  Product.findById(productId).then(([product])=>{
+  Product.findByPk(productId).then((product)=>{
     if(!product) return res.redirect('/');
     res.render('admin/add-product', {
       pageTitle: 'Edit Product',
       path: '/admin/edit-product',
       editing :editMode,
-      product:product[0]
+      product:product
     });
   }).catch(err=>console.log(err))
 };
 
 exports.postEditProduct =(req,res)=>{
 const {title,productId, imageUrl, price,description} = req.body;
-const updatedProduct = new Product(productId,title,imageUrl,description,price);
-updatedProduct.save().then(()=>
 
-res.redirect('/admin/products')
-).catch(err=>console.log(err));
+
+Product.update({title,productId, imageUrl, price,description},{where:{id:productId}}).then(()=>res.redirect('/admin/products')).catch(err=>console.log(err))
 }
 
 exports.getProducts = (req, res, next) => {
-  Product.fetchAll().then(([products])=>{
+  
+  Product.findAll().then(products=>{
     res.render('admin/products', {
       prods: products,
       pageTitle: 'Admin Products',
@@ -62,7 +59,7 @@ exports.getProducts = (req, res, next) => {
 
 exports.deleteProduct=(req,res)=>{
 const {productId} = req.params;
-Product.delete(productId).then(()=>
+Product.destroy({where:{id:productId}}).then(()=>
 res.redirect('/admin/products')
 ).catch(err=>console.log(err))
 }
