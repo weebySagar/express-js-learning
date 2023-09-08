@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User</title>
+</head>
+<body>
+    <section class="user-form-group">
+        <form action="/users/addUser" method="post" class="user-form">
+            <div class="user-name">
+                <label for="name">Name</label>
+                <input type="text" name="name" id="name">
+            </div>
+            <div class="user-phoneNO">
+                <label for="phoneNo">Phone Number</label>
+                <input type="number" name="phoneNo" id="phoneNo">
+            </div>
+            <div class="user-email">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email">
+            </div>
+
+            <button type="submit">Submit</button>
+        </form>
+
+        <div id="users">
+
+        </div>
+    </section>
+
+    <script>
+        const usersDiv = document.getElementById('users');
+       async function getUsers(){
+          const response = await  fetch('http://localhost:3000/users/getAllUsers');
+          const data = await response.json();
+
+          const users =document.getElementById('users');
+          
+          
+       
+          for(let i=0;i<data.length;i++){
+            const div = document.createElement('div');
+            const btn =document.createElement('button');
+            div.appendChild(document.createTextNode(data[i].name));
+            div.appendChild(document.createTextNode(data[i].email));
+            div.appendChild(document.createTextNode(data[i].phoneNo));
+            div.id= data[i].id;
+            btn.textContent='Delete';
+            btn.className='delete';
+            div.appendChild(btn);
+            users.appendChild(div);
+
+          }
+          
+        }
+        async function deleteUser(e){
+            if(e.target.classList.contains('delete')){
+
+                const div = e.target.parentElement;
+                await fetch(`/users/deleteUser/${div.id}`,{
+                    method:'DELETE' 
+                })
+                usersDiv.removeChild(div);
+            }
+        }
+        
+        usersDiv.addEventListener('click',deleteUser)
+        document.addEventListener('DOMContentLoaded',getUsers)
+
+    </script>
+</body>
+</html>
