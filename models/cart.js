@@ -1,36 +1,14 @@
-const { log } = require('console');
-const fs = require('fs');
-const path = require('path');
+const {Sequelize} = require('sequelize');
 
-const p = path.join(path.dirname(process.mainModule.filename),'data','cart.json');
+const db = require('../util/database');
 
-module.exports = class Cart{
-    static addProduct(id,productPrice){
-        fs.readFile(p,(error, data)=>{
-            let cart = {products :[],totalPrice :0}
-            if(!error){
-                cart = JSON.parse(data);
-            }
-
-            const existingProductIndex = cart.products.findIndex(prod => prod.id === id);
-            const existingProduct = cart.products[existingProductIndex];
-            let updatedProduct;
-
-            if(existingProduct){
-                updatedProduct = {...existingProduct};
-                updatedProduct.qty = updatedProduct.qty +1;
-                cart.products = [...cart.products];
-                cart.products[existingProductIndex] = updatedProduct
-            }
-            else{
-                updatedProduct = {id:id , qty:1};
-                cart.products = [...cart.products,updatedProduct]
-            }
-
-            cart.totalPrice = cart.totalPrice + +productPrice;
-            fs.writeFile(p,JSON.stringify(cart),(err)=>{
-                console.log(err);
-            })
-        })
-    }
+const Cart =db.define('cart',{
+id:{
+    type: Sequelize.INTEGER,
+    allowNull:false,
+    primaryKey:true,
+    autoIncrement:true
 }
+});
+
+module.exports =Cart;
